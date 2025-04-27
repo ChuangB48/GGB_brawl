@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>GGB</title>
+        <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+    </head>
+    <body>
+        <div id="ggb-container"></div>
+        <script>
+            const applet=new GGBApplet({
+                appName: "graphing",
+                id: "myGgbApplet",
+                width: 1600,
+                height: 900,
+                showToolBar: true,
+                showAlgebraInput: true,
+                showMenuBar: true,
+                appletOnLoad(ggbApi){
+                    ggbApi.evalCommand('A=(0,0)');
+                    ggbApi.evalCommand('Text("hi",A,true)');
+                }
+            }, true);
+            window.addEventListener("load",()=>{
+                applet.inject("ggb-container");
+            });
+        </script>
+    </body>
+</html>
