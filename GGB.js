@@ -54,6 +54,14 @@ const applet=new GGBApplet({
                     }
                 }
             }
+            else if(data.type=="out"){
+                ggbApi.deleteObject(data.name);
+                for(let a=0;a<user.length;a++){
+                    if(user[a].name==data.name){
+                        user.splice(a,1);
+                    }
+                }
+            }
         }
         socket.send(JSON.stringify({
             "type":"start",
@@ -100,6 +108,14 @@ const applet=new GGBApplet({
                     "type":"move",
                     "name":n,
                     "dir":"d"
+                }));
+            }
+            if(e.code=="Digit0"){
+                x=0;
+                y=0;
+                socket.send(JSON.stringify({
+                    "type":"res",
+                    "name":n
                 }));
             }
         });

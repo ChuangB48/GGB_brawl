@@ -30,6 +30,19 @@
             <input type="text" id="i">
         </div>
         <script>
+            const socket=new WebSocket("ws://127.0.0.1:80");
+            socket.onmessage=event=>{
+                data=JSON.parse(event.data);
+                if(data.type=="in"){
+                    if(data.allow=="y"){
+                        document.cookie="name="+data.name;
+                        location.href="GGB.html";
+                    }
+                    else{
+                        alert("名字已被使用。");
+                    }
+                }
+            }
             document.addEventListener('keydown',e=>{
                 if(e.code=="Enter"){
                     a=document.getElementById("i");
@@ -37,11 +50,13 @@
                         alert("名字不能為空。");
                     }
                     else if(a.value[0]>"Z"||a.value[0]<"A"){
-                        alert("首字必為大寫英文字母");
+                        alert("首字必為大寫英文字母。");
                     }
                     else{
-                        document.cookie="name="+a.value.trim();
-                        location.href="GGB.html";
+                        socket.send(JSON.stringify({
+                            "type":"in",
+                            "name":a.value.trim()
+                        }));
                     }
                 }
             });

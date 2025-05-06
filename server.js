@@ -7,7 +7,18 @@ const server=express().listen(port,()=>{
 const wss=new WebSocket({server});
 let user=[];
 wss.on("connection",ws=>{
-    ws.on("close",()=>{});
+    ws.on("close",()=>{
+        const a=user.findIndex(u=>u.ws===ws);
+        if (a!==-1){
+            wss.clients.forEach(function each(client){
+                client.send(JSON.stringify({
+                    "type":"out",
+                    "name":user[a].name
+                }));
+            });
+            user.splice(a,1);
+        }
+    });
     ws.on("message",data=>{
         data=JSON.parse(data.toString());
         if(data.type=="start"){
@@ -15,7 +26,8 @@ wss.on("connection",ws=>{
                 "name":data.name,
                 "x":0,
                 "y":0,
-                "text":""
+                "text":"",
+                "ws":ws
             });
             wss.clients.forEach(function each(client){
                 client.send(JSON.stringify({
@@ -73,6 +85,46 @@ wss.on("connection",ws=>{
                     });
                     break;
                 }
+            }
+        }
+        else if(data.type=="res"){
+            for(let a=0;a<user.length;a++){
+                if(user[a].name==data.name){
+                    user[a].x=0;
+                    user[a].y=0;
+                    wss.clients.forEach(function each(client){
+                        client.send(JSON.stringify({
+                            "type":"move",
+                            "name":user[a].name,
+                            "x":0,
+                            "y":0
+                        }));
+                    });
+                    break;
+                }
+            }
+        }
+        else if(data.type=="in"){
+            let z=false;
+            for(let a=0;a<user.length;a++){
+                if(user[a].name==data.name){
+                    z=true;
+                    break;
+                }
+            }
+            if(z){
+                ws.send(JSON.stringify({
+                    "type":"in",
+                    "name":data.name,
+                    "allow":"n"
+                }));
+            }
+            else{
+                ws.send(JSON.stringify({
+                    "type":"in",
+                    "name":data.name,
+                    "allow":"y"
+                }));
             }
         }
     });
