@@ -1,4 +1,4 @@
-const socket=new WebSocket("ws://127.0.0.1:80");
+const socket=new WebSocket("wss://ggb-brawl.onrender.com");
 let n=document.cookie.substring(5,document.cookie.length);
 let user=[],x=0,y=0;
 const applet=new GGBApplet({
