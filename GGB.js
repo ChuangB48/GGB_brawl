@@ -63,10 +63,12 @@ const applet=new GGBApplet({
                 }
             }
         }
-        socket.send(JSON.stringify({
-            "type":"start",
-            "name":n
-        }));
+        socket.onopen=()=>{
+            socket.send(JSON.stringify({
+                "type":"start",
+                "name":n
+            }));
+        }
         document.addEventListener("keydown",e=>{
             if(e.code=="Enter"){
                 let i=document.getElementById("i");
