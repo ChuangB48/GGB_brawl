@@ -1,81 +1,67 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>login</title>
-  <style>
-    div {
-      position: absolute;
-      width: 50vw;
-      height: 50vh;
-      left: 25vw;
-      top: 25vh;
-      border: 1px lightskyblue solid;
-      border-radius: 10px;
-      text-align: center;
-    }
-    span {
-      font-size: xx-large;
-    }
-  </style>
-</head>
-<body>
-  <div>
-    <br><br><br><br><br><br>
-    <span>Enter Your Name</span>
-    <br><br><br><br><br>
-    <input type="text" id="i">
-  </div>
-  <script>
-    let pendingName = null;
-
-    const socket = new WebSocket("wss://ggb-brawl-1.onrender.com");
-    socket.onmessage = event => {
-      const data = JSON.parse(event.data);
-      if (data.type == "in") {
-        if (data.allow == "y") {
-          document.cookie = "name=" + data.name;
-          location.href = "GGB.html";
-        } else {
-          alert("名字已被使用。");
-        }
-      }
-    };
-
-    // 在一開始就把 onopen 綁好：
-    socket.onopen = () => {
-      if (pendingName) {
-        socket.send(JSON.stringify({
-          type: "in",
-          name: pendingName
-        }));
-      }
-    };
-
-    document.addEventListener('keydown', e => {
-      if (e.code === "Enter") {
-        const a = document.getElementById("i");
-        const name = a.value.trim();
-        if (name === '') {
-          alert("名字不能為空。");
-          return;
-        }
-        if (name[0] > "Z" || name[0] < "A") {
-          alert("首字必為大寫英文字母。");
-          return;
-        }
-        // 將名字暫存，等 onopen 觸發時會自動送
-        pendingName = name;
-
-        // 如果已經 OPEN，就立即送
-        if (socket.readyState === WebSocket.OPEN) {
-          socket.send(JSON.stringify({
-            type: "in",
-            name: pendingName
-          }));
-        }
-        // 如果還沒 OPEN，就等上面 onopen 那段碼送
-      }
-    });
-  </script>
-</body>
+    <head>
+        <title>
+            login
+        </title>
+        <style>
+            div{
+                position: absolute;
+                width: 50vw;
+                height: 50vh;
+                left: 25vw;
+                top: 25vh;
+                border: 1px lightskyblue solid;
+                border-radius: 10px;
+                text-align: center;
+            }
+            span{
+                font-size: xx-large;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <br><br><br><br><br><br>
+            <span>
+                Enter Your Name
+            </span>
+            <br><br><br><br><br>
+            <input type="text" id="i">
+        </div>
+        <script>
+            const socket=new WebSocket("wss://ggb-brawl-1.onrender.com");
+            socket.onmessage=event=>{
+                data=JSON.parse(event.data);
+                if(data.type=="in"){
+                    if(data.allow=="y"){
+                        document.cookie="name="+data.name;
+                        location.href="GGB.html";
+                    }
+                    else{
+                        alert("名字已被使用。");
+                    }
+                }
+            }
+            document.addEventListener('keydown',e=>{
+                if(e.code=="Enter"){
+                    a=document.getElementById("i");
+                    if(a.value.trim()==''){
+                        alert("名字不能為空。");
+                    }
+                    else if(a.value[0]>"Z"||a.value[0]<"A"){
+                        alert("首字必為大寫英文字母。");
+                    }
+                    else{
+                        socket.onopen=()=>{
+                            socket.send(JSON.stringify({
+                                "type":"in",
+                                "name":a.value.trim()
+                            }));
+                        }
+                    }
+                }
+            });
+        </script>
+    </body>
 </html>
