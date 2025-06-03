@@ -30,7 +30,7 @@
             <input type="text" id="i">
         </div>
         <script>
-            const socket=new WebSocket("wss://ggb-brawl.onrender.com");
+            const socket=new WebSocket("wss://ggb-brawl-1.onrender.com");
             socket.onmessage=event=>{
                 data=JSON.parse(event.data);
                 if(data.type=="in"){
