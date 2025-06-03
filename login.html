@@ -53,12 +53,10 @@
                         alert("首字必為大寫英文字母。");
                     }
                     else{
-                        socket.onopen=()=>{
-                            socket.send(JSON.stringify({
-                                "type":"in",
-                                "name":a.value.trim()
-                            }));
-                        }
+                        socket.send(JSON.stringify({
+                            "type":"in",
+                            "name":a.value.trim()
+                        }));
                     }
                 }
             });
