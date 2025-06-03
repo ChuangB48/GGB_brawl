@@ -1,30 +1,99 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>GGB</title>
-        <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>GeoGebra 貪吃蛇</title>
+    <script src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+    <style>
+        body{ margin:0; padding:0; }
+        #ggb-applet{ width:800px; height:600px; margin:20px auto; display:block; }
+        button{ display:block; margin:10px auto; }
+        #gameOverOverlay{
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.65);
+        display:none;
+        justify-content:center;
+        align-items:center;
+        z-index:999;
+        font-size:60px;
+        font-weight:bold;
+        color:#ffeb3b;
+        user-select:none;
+        pointer-events:none;
+        }
+    </style>
     </head>
-    <body>
-        <div id="ggb-container"></div>
-        <script src="popcat.js"></script>
-        <script>
-            const applet=new GGBApplet({
-                appName: "graphing",
-                id: "myGgbApplet",
-                width: 1600,
-                height: 900,
-                showToolBar: true,
-                showAlgebraInput: true,
-                showMenuBar: true,
-                appletOnLoad(ggbApi){
-                    ggbApi.evalCommand('A=(0,0)');
-                    ggbApi.evalCommand('Text("hi",A,true)');
-                }
-            }, true);
-            window.addEventListener("load",()=>{
-                applet.inject("ggb-container");
-            });
-        </script>
-    </body>
+
+    <body tabindex="0">
+    <div id="ggb-applet"></div>
+
+    <button id="testMove">手動以開始</button>
+    <div id="gameOverOverlay">Game Over</div>
+
+    <script>
+        let gameOver = false;
+        let score = 0;
+
+        const applet = new GGBApplet({
+        appName:"classic",
+        width:800, height:600,
+        showToolBar:false,
+        showAlgebraInput:false,
+        showMenuBar:false,
+        filename:"snake.ggb"
+        }, true);
+
+        window.addEventListener("load", () => {
+        applet.inject("ggb-applet");
+        window.ggbApplet = document.applets[0];
+        document.body.focus();
+
+        document.getElementById("testMove").onclick = nextStep;
+
+        document.body.addEventListener("keydown", evt=>{
+            if(gameOver) return;
+            if(evt.key.startsWith("Arrow")){
+            evt.preventDefault();
+            const map={ArrowUp:1,ArrowDown:2,ArrowLeft:3,ArrowRight:4};
+            ggbApplet.evalCommand("d = "+map[evt.key]);
+            nextStep();
+            }
+        });
+        });
+        function nextStep(){
+        if(gameOver) return;
+        const ggb = ggbApplet;
+        ggb.evalCommand('dx = If(d==1,0,If(d==2,0,If(d==3,-1,1)))');
+        ggb.evalCommand('dy = If(d==1,1,If(d==2,-1,If(d==3,0,0)))');
+        ggb.evalCommand('newA = (x(A)+dx, y(A)+dy)');
+        const xA=ggb.getXcoord("newA"), yA=ggb.getYcoord("newA");
+        const xB=ggb.getXcoord("B"),    yB=ggb.getYcoord("B");
+        const xC=ggb.getXcoord("C"),    yC=ggb.getYcoord("C");
+        const xF=ggb.getXcoord("F"),    yF=ggb.getYcoord("F");
+        if(
+            xA<1||xA>15||yA<1||yA>15||
+            (xA===xB&&yA===yB)||
+            (xA===xC&&yA===yC)
+        ){
+            ggb.evalCommand('SetValue[TextGameOver,Text("Game Over",(5,8))]');
+            document.getElementById("gameOverOverlay").style.display="flex";
+            gameOver = true;
+            return;
+        }
+
+        if(xA===xF && yA===yF){
+            ggb.evalCommand('SetValue[F,(RandomBetween(2,14),RandomBetween(2,14))]');
+            score++;
+            ggb.evalCommand('SetValue[score,'+score+']');
+            ggb.evalCommand('SetValue[TextScore,Text("Score: "+score,(1,16.5))]');
+        }else{
+            ggb.evalCommand('SetValue[C,B]');
+        }
+
+        ggb.evalCommand('SetValue[B,A]');
+        ggb.evalCommand('SetValue[A,newA]');
+        }
+    </script>
+</body>
 </html>
